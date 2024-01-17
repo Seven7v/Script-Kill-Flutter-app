@@ -48,9 +48,37 @@ void main(List<String> args) {
 
   // MAP OBJ
 
-  var obj = {"name": "xiaotao", "age": 23};
-  Map obj2 = new Map();
-  obj2["class"] = "class one";
-  print(obj2);
-  print(obj["name"]);
+  // var obj = {"name": "xiaotao", "age": 23};
+  // Map obj2 = new Map();
+  // obj2["class"] = "class one";
+  // print(obj2);
+  // print(obj["name"]);
+
+  // is 判断类型
+
+  // List arr1 = [1, 23, 'sser'];
+  // String str = 'sedsk';
+  // double num = 12.5;
+  // print(arr1 is String);
+  // print(arr1 is List);
+  // print(str is String);
+  // print(num is int);
+  // print(num is double);
+
+  // 类型转换
+  // int.parse 只能转换整型，
+  // 浮点型需要用double.parse来转换
+  // 所以可以全部使用 double.parse 来转换
+  // String str = '121.5';
+  // // int num = int.parse(str); // 报错
+  // double num2 = double.parse(str);
+  // String str1 = num2.toString();
+  // print(num2);
+  // print(str1 == str);
+
+  // 算数运算符
+  // + - * /  %余数 ~/取整
+  // int a = 5;
+  // int b = 2;
+  // print(a ~/ b);
 }
