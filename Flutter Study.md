@@ -43,7 +43,7 @@ void main(List<String> args) {
 
 ## dart 数据类型
 
-#### String 字符串
+### String 字符串
 
 字符串定义可以使用 '单引号',"双引号",'''三引号可以换行！！！'''
 dart 提供 $变量 的方式，再字符串中引入别的内容,不论是什么用什么定义的字符串
@@ -99,7 +99,7 @@ void main(List<String> args) {
 使用 List 来定义数组，自然也可以使用 var
 可以使用 `  <String>`的方式来定义数组中的内容是那种类型，要求字符串中所有的内容都是 String 类型的
 
-#### 数组的方法
+### 数组的方法
 
 `List.filled(length, '1')`相当于创建了一个固定长度的数组，后面的内容可以不填写。 创建后不可以通过 add 增加来改变 List 长度，也不可以通过 length 赋值来改变 List 长度
 
@@ -215,7 +215,7 @@ void main(List<String> args) {
 
 **`List.indexOf(value)`** 查找指定元素索引
 
-#### 添加
+### 添加
 
 **`List.add()`** 向 List 中添加元素
 
@@ -244,7 +244,7 @@ void main(List<String> args) {
 }
 ```
 
-#### 删除
+### 删除
 
 **`List.remove()`** 删除指定元素
 
@@ -267,7 +267,7 @@ void main(List<String> args) {
 }
 ```
 
-#### 数组循环遍历方法
+### 数组循环遍历方法
 
 **`List.foreach((element){})`**
 
@@ -501,7 +501,7 @@ Function() a() {
 
 ### 构造函数
 
-#### 默认构造函数
+### 默认构造函数
 
 ```dart
 void main(List<String> args) {
@@ -563,7 +563,7 @@ class Student {
 
 ```
 
-#### 多个构造函数
+### 多个构造函数
 
 多个构造函数可以用来接受不同个数的参数，来创建实例。这里需要给没有被接受的属性赋初始值。
 这里使用了 dart 自带的方法`dart:convert`中的 `jsonEncode`来进行 Json 转换。
@@ -616,3 +616,354 @@ class Result {
   }
 }
 ```
+
+### get & set
+
+类中的 get 和 set 类似于提供了一个属性
+可以直接通过该关键字定义对应的属性，以便后面访问和修改
+
+get 定义时后是一个对象
+set 需要接受一个参数，在使用 set 时不可以使用函数传参 ，要用直接赋值。
+
+`..`类中属性和方法的链式调用可以使用。不需要写多个语句
+
+```dart
+void main(List<String> args) {
+  // 使用js的写法，创建一个类的实例需要用到关键词new，在dart中不需要使用new
+  // var student = new Student();
+  Student student = Student('lisi', '5', 12);
+  student.detail();
+  Result code = Result.code(200);
+  Result msg = Result.msg(500, '系统服务错误');
+  Result data = Result.data(200, 'success', {
+    'title': 'Tiltle',
+    'list': [2, 5, 3]
+  });
+  // 转换成JSON打印，要想执行这个函数，需要在类里写一个toJson 的方法
+  print(jsonEncode(data));
+  print(jsonEncode(msg));
+  print(jsonEncode(code));
+  //  set 的调用方法时直接赋值。
+  msg.msgValue = '请求成功';
+  print(msg.mes);
+  // 如果是类中的属性及方法的链式调用 可以使用 '..'
+  msg
+    ..msgValue = '请求失败'
+    ..getContent();
+}
+
+class Result {
+  // 多个构造函数需要有初始值。类似于不必传的参数
+  int code;
+  String msg = '';
+  Map data = {};
+  Result.code(this.code);
+  Result.msg(this.code, this.msg);
+  Result.data(this.code, this.msg, this.data);
+
+  // get 类似于属性的调用，可以直接获取对应数据
+  get mes {
+    return 'code: $code, $msg';
+  }
+
+  // set
+  set msgValue(value) {
+    msg = value;
+  }
+
+  getContent() {
+    print('code: $code, msg: $msg');
+  }
+```
+
+### 私有！
+
+预定 在变量或者方法等内容钱加 "\_"代表时私有的内容，在外面文件不可以访问私有属性。
+如果类在当前页面定义，在当前页面方法中可以 获取到私有属性。
+如果该类被其他文件引入，则私有属性不可以被访问，访问会报错
+
+`/class.dart`
+
+```dart
+class Result {
+  // 多个构造函数需要有初始值。类似于不必传的参数
+  int code;
+  String msg = '';
+  Map _data = {};
+  Result.data(this.code, this.msg, this._data);
+}
+```
+
+`/use.dart`
+
+```dart
+import './class.dart';
+void main(List<String> args) {
+  Result data = Result.data(200, 'success', {
+    'list': [1, 2],
+    'title': 'xxee'
+  });
+  print(data._data); // 项目运行代码检查都会报错
+}
+```
+
+### static
+
+使用`static`定义的属性是静态属性，定义的方法是静态的方法。
+**使用 static 定义的方法可以直接通过类名加属性调用，不需要创建实例。**
+
+静态的方法与属性都只能访问静态数据，不可以使用类中定义的其他属性值。会报错。
+
+```dart
+void main(List<String> args) {
+  print(Result.resultErrorCode);
+  print(Result.resultSuccessCode);
+  print(Result.resultSuccess());
+  print(Result.resultError());
+}
+
+class Result {
+  // 多个构造函数需要有初始值。类似于不必传的参数
+  int code;
+  String msg = '';
+  Map _data = {};
+  Result.code(this.code);
+  Result.msg(this.code, this.msg);
+  Result.data(this.code, this.msg, this._data);
+  // static 静态属性 可以直接通过类名访问的属性，不需要实例化
+  static int resultSuccessCode = 200;
+  static String resultSuccessMsg = 'success';
+  static int resultErrorCode = 500;
+  static String resultErrorMsg = 'Systom error';
+  // 静态方法
+  static String resultSuccess() {
+    return jsonEncode(Result.msg(resultSuccessCode, resultSuccessMsg));
+  }
+
+  static String resultError() =>
+      jsonEncode(Result.msg(resultErrorCode, resultErrorMsg));
+
+
+  // 类如果想要被dart:convert 转换成JSon格式一定要有toJson 方法。
+  // 将类中的每一个值放入Map中 返回
+  Map toJson() {
+    Map map = Map();
+    // Map map = {}; 这种写法也可以
+    if (code != 0) {
+      map['code'] = code;
+    }
+    if (msg.isNotEmpty) {
+      map['msg'] = msg;
+    }
+    if (_data.isNotEmpty) {
+      map['data'] = _data;
+    }
+    return map;
+  }
+}
+```
+
+### 继承
+
+继承使用的是 extends 关键字
+
+`class Group extends Student`, 继承的类需要有自己的构造函数，再构造函数中通过`super`来继承父级的属性
+
+继承后子类可以直接调用父类的方法，也可以重写父类的方法。
+`@override`重写父类方法，可以省略
+
+```dart
+void main(List<String> args) {
+  // 使用js的写法，创建一个类的实例需要用到关键词new，在dart中不需要使用new
+  // var student = new Student();
+  Student student = Student('lisi', '5', 12);
+  student.detail();
+  Group group = Group('wangwu', '2', 8, '无敌');
+  group.detail();
+  group.group();
+  group.detail();
+  print(group is Group);
+  print(group is Student);
+}
+
+class Student {
+  String name;
+  String grade;
+  int age;
+  Student(this.name, this.grade, this.age);
+  detail() {
+    // 可以使用参数 。this.name/this.grade，也可不不适用this
+    // 使用this拼接字符串需要加上{},页面会提示this. is Unnecessary
+    print('${this.name} is Grade ${this.grade},${this.age} year old');
+    print('$name is Grade $grade,$age year old');
+  }
+}
+
+// 写法还是要注意一下 与js不同
+class Group extends Student {
+  String groupStage;
+  // 构造函数
+  Group(String name, String grade, int age, this.groupStage)
+      : super(name, grade, age);
+
+  group() {
+    print('$name is $groupStage');
+  }
+
+  @override
+  detail() {
+    print('$name is Grade $grade,$age year old,is $groupStage');
+  }
+}
+```
+
+### 抽象类
+
+抽象类是对本质相同内容类定义一个标准.有相同本质要实现不同功能的子类可以继承这个类,需要实现其中定义的抽象方法
+
+`abstract`关键字定义抽象类
+
+**举个例子**
+
+Result 是一个抽象类, success(); 和 error()是其中的两个方法.子类中需要将这两个抽象方法重写.
+
+抽象类也可有普通方法,所有人相同的公用方法.
+
+### 多态
+
+定义使用父类的类型,用子类创建实例,就可以使用对应实例里的方法.
+(可用与传参接受不同的参数)
+
+```dart
+void main(List<String> args) {
+  RequestResult req = RequestResult(200, 'success', '成功', [1, 2]);
+  req.fetch();
+  req.error();
+  req.success();
+  UpdateResult upd = UpdateResult(500, 'error', '失败');
+  upd.error();
+  upd.success();
+  // 多态
+  // 定义使用父类的类型,用子类创建实例,就可以使用对应实例里的方法.
+  // 可用与传参接受不同的参数
+  Result resq = RequestResult(500, 'error', '失败', [3]);
+  resq.success();
+}
+
+// 抽象类
+// 对请求 更新 的结果坐不同的处理
+abstract class Result {
+  // 类似于制定一个本质相同类的标准
+  // 本质功能相同但是有差异的内容需要继承这个类，实现抽象方法。
+  int code = 200;
+  String type = 'success';
+  String msg = '请求成功'; //
+  Result(this.code, this.type, this.msg);
+  // 普通方法(公用的)
+  fetch() {
+    // 同样的接受参数
+    print('fetch');
+  }
+
+  // 抽象方法需要子类自行实现
+  // 根据成功和失败需要实现不同的返回方法
+
+  success();
+  // error 对不同code 的处理
+  error();
+}
+
+class RequestResult extends Result {
+  List data = [];
+  RequestResult(int code, String type, String msg, this.data)
+      : super(code, type, msg);
+  @override
+  error() {
+    print('$code 请求失败.');
+  }
+
+  @override
+  success() {
+    print('$code 请求成功. $data');
+  }
+}
+
+class UpdateResult extends Result {
+  UpdateResult(
+    int code,
+    String type,
+    String msg,
+  ) : super(code, type, msg);
+
+  @override
+  error() {
+    print('$code 更新失败.');
+  }
+
+  @override
+  success() {
+    print('$code 更新成功');
+  }
+}
+```
+
+### 接口
+
+抽象类中可以写一些普通方法,接口中的内容全部都是抽象的内容.不会有普通方法
+使用 `implements`关键字,意味着实现对应的类,需要将里面所有的方法实现.
+implements 可以一次实现多个类.
+`class Upload implements Result,A,B{}`
+
+```dart
+class Upload implements Result {
+  @override
+  int code;
+
+  @override
+  String msg;
+
+  @override
+  String type;
+
+  @override
+  error() {}
+
+  @override
+  fetch() {}
+
+  @override
+  success() {}
+}
+```
+
+### 混入
+
+`mixin`关键字可以将类定义成可混入的类,其他类混入后可以使用其中的方法
+`with`后加混入类.
+`class C with A,B{}`
+
+> 混入类不可以有构造函数
+> 混入类不可以继承其他类
+> 如果混入了两个类里有相同 方法,后来居上原则.调用方法调用的是后引入类的方法.
+> 可以对混入的类中的方法进行重写
+
+```dart
+void main(List<String> args) {
+  C c = C();
+  c.a();
+  print(c is A);// true
+}
+mixin class A {
+  a() {
+    print('a');
+  }
+}
+
+mixin class B {
+  b() {}
+}
+
+class C with A, B {}
+```
+
+## 泛型

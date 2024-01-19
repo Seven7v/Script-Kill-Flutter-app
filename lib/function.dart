@@ -1,3 +1,5 @@
+import './class.dart';
+
 void main(List<String> args) {
   int num = sum(2, 10, 15);
   int num1 = sum(2, 10);
@@ -11,6 +13,12 @@ void main(List<String> args) {
   fn();
   fn();
   fn();
+
+  Result data = Result.data(200, 'success', {
+    'list': [1, 2],
+    'title': 'xxee'
+  });
+  print(data._data);
 }
 
 // void代表函数没有返回值，前面的内容用来后面确定函数返回值的类型

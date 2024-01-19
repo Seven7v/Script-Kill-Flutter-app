@@ -13,13 +13,28 @@ void main(List<String> args) {
     'list': [2, 5, 3]
   });
   // 下列方式直接打印指挥显示Instance of 'Result'
-  print(code);
-  print(msg);
+  // print(code);
+  // print(msg);
   print(data);
   // 转换成JSON打印，要想执行这个函数，需要在类里写一个toJson 的方法
   print(jsonEncode(data));
   print(jsonEncode(msg));
   print(jsonEncode(code));
+  //  set 的调用方法时直接赋值。
+  msg.msgValue = '请求成功';
+  print(msg.mes);
+  msg
+    ..msgValue = '请求成功'
+    ..getContent();
+  print(Result.resultErrorCode);
+  print(Result.resultSuccess());
+  print(Result.resultError());
+  Group group = Group('wangwu', '2', 8, '无敌');
+  group.detail();
+  group.group();
+  group.detail();
+  print(group is Group);
+  print(group is Student);
 }
 
 class Student {
@@ -65,10 +80,37 @@ class Result {
   // 多个构造函数需要有初始值。类似于不必传的参数
   int code;
   String msg = '';
-  Map data = {};
+  Map _data = {};
   Result.code(this.code);
   Result.msg(this.code, this.msg);
-  Result.data(this.code, this.msg, this.data);
+  Result.data(this.code, this.msg, this._data);
+  // static 静态属性 可以直接通过类名访问的属性，不需要实例化
+  static int resultSuccessCode = 200;
+  static String resultSuccessMsg = 'success';
+  static int resultErrorCode = 500;
+  static String resultErrorMsg = 'Systom error';
+
+  static String resultSuccess() {
+    return jsonEncode(Result.msg(resultSuccessCode, resultSuccessMsg));
+  }
+
+  static String resultError() =>
+      jsonEncode(Result.msg(resultErrorCode, resultErrorMsg));
+
+  // get 类似于属性的调用，可以直接获取对应数据
+  get mes {
+    return 'code: $code, $msg';
+  }
+
+  // set
+  set msgValue(value) {
+    msg = value;
+  }
+
+  getContent() {
+    print('code: $code, msg: $msg');
+  }
+
   // 类如果想要被dart:convert 转换成JSon格式一定要有toJson 方法。
   // 将类中的每一个值放入Map中 返回
   Map toJson() {
@@ -80,9 +122,26 @@ class Result {
     if (msg.isNotEmpty) {
       map['msg'] = msg;
     }
-    if (data.isNotEmpty) {
-      map['data'] = data;
+    if (_data.isNotEmpty) {
+      map['data'] = _data;
     }
     return map;
+  }
+}
+
+// 继承
+
+class Group extends Student {
+  String groupStage;
+  Group(String name, String grade, int age, this.groupStage)
+      : super(name, grade, age);
+
+  group() {
+    print('$name is $groupStage');
+  }
+
+  @override
+  detail() {
+    print('$name is Grade $grade,$age year old,is $groupStage');
   }
 }
