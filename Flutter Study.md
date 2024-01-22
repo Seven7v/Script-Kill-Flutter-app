@@ -943,8 +943,11 @@ class Upload implements Result {
 `class C with A,B{}`
 
 > 混入类不可以有构造函数
+
 > 混入类不可以继承其他类
+
 > 如果混入了两个类里有相同 方法,后来居上原则.调用方法调用的是后引入类的方法.
+
 > 可以对混入的类中的方法进行重写
 
 ```dart
@@ -967,3 +970,146 @@ class C with A, B {}
 ```
 
 ## 泛型
+
+### 泛型方法
+
+(ps:基本上不会独立存在)
+
+> 函数的返回类型,或者参数类型在调用函数的时候传入,更加灵活使用
+
+```dart
+void main(List<String> args) {
+  List<String> list = ['23', '32'];
+  print(getValue<String>('EW'));
+  print(getValue<int>(2));
+}
+
+T getValue<T>(T value) {
+  return value;
+}
+
+```
+
+### 泛型类
+
+泛型类定义类的类型。在创建实例的时候传入。
+
+```dart
+void main(List<String> args) {
+    // 创建实例时传入类型
+  Document<String> docs = Document({'title': 'title', 'content': 'content'});
+  docs.setDocumet('editor', 'lisi');
+  print(docs.getDocument('editor'));
+  Document<List<String>> docs2 = Document({
+    'title': ['title']
+  });
+  docs2.setDocumet('editor', ['lisi']);
+  print(docs2.getDocument('editor'));
+}
+
+// 这里T是传入的类型。根据传入的T 来决定Map value 值的类型。
+class Document<T> {
+  Map<String, T> doc = {};
+  Document(this.doc);
+  setDocumet(String key, T value) {
+    doc[key] = value;
+  }
+
+  T? getDocument(String key) {
+    return doc[key];
+  }
+}
+```
+
+如果要实现一个类，传入类型后可以调用 Document 中的 getDocument 等方法，可以用泛型限定 传入的数据类型
+
+```dart
+void main(List<String> args) {
+  List<String> list = ['23', '32'];
+  print(getValue<String>('EW'));
+  print(getValue<int>(2));
+  Document<String> docs = Document({'title': 'title', 'content': 'content'});
+  docs.setDocumet('editor', 'lisi');
+  print(docs.getDocument('editor'));
+  // var mark = Markdown(docs);
+  // mark.init();
+  Markdown<Document<String>> mark = Markdown(docs);
+  mark.init();
+}
+
+// 复用上面的Document类
+class Document<T> {
+  Map<String, T> doc = {};
+  Document(this.doc);
+  setDocumet(String key, T value) {
+    doc[key] = value;
+  }
+
+  T? getDocument(String key) {
+    return doc[key];
+  }
+}
+
+// 指定传入的类型需要时 Document<String>的实例
+// 其中String 不可以用T 替换。否则创建实例会报错
+class Markdown<T extends Document<String>> {
+  T docs;
+  Markdown(this.docs);
+  init() {
+    print(docs.getDocument('title'));
+  }
+}
+```
+
+### 泛型接口
+
+只是在定义抽象类的时候在后面加上`<T>`传入类型,在继承抽象类是也需要 使用泛型
+
+```dart
+abstract class Catch<T> {
+  T? getCatch(String key);
+  setCatch(String key, T value);
+}
+
+class MameryCatch<T> extends Catch<T> {
+  @override
+  T? getCatch(String key) {
+    return null;
+  }
+
+  @override
+  setCatch(String key, T value) {
+    print('set');
+  }
+}
+```
+
+## 库
+
+### 自定义库
+
+可以直接创建一个 dart 文件，写好内容
+`import '/xxx.dart` 导入里面全部内容。
+
+如果想指定方法导入 可是使用 show
+`import '/xxx.dart show A,B`
+
+指定某些内容不导入 用 hide 来指定不导入某些内容
+`import '/xxx.dart hide A,B`
+
+### dart 内置库
+
+`dart:io` `dart:convert`这里就是 dart 的内置库，提供了不同的方法。
+
+### 三方库
+
+查询的话 可以 使用 pug.dev 可以查询对应的三方库内容。
+
+- 创建一个 文件 `pubspec.yaml`
+- 必须要写的内容 name 和 环境
+
+```dart
+  name: 'app'
+  environment:
+  sdk: '^3.2.0'
+```
