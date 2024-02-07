@@ -3,8 +3,8 @@ void main(List<String> args) {
   // dynamic 是动态的意思
   Map<String, dynamic> obj = {"name": "zhangshan", "age": 1};
 
-  var keys = obj.keys;
-  var values = obj.values;
+  // var keys = obj.keys;
+  // var values = obj.values;
   var items = obj.entries;
   print(items);
   for (var element in items) {

@@ -1103,7 +1103,7 @@ class MameryCatch<T> extends Catch<T> {
 
 ### 三方库
 
-查询的话 可以 使用 pug.dev 可以查询对应的三方库内容。
+查询的话 可以 使用 pub.dev 可以查询对应的三方库内容。
 
 - 创建一个 文件 `pubspec.yaml`
 - 必须要写的内容 name 和 环境
@@ -1112,4 +1112,160 @@ class MameryCatch<T> extends Catch<T> {
   name: 'app'
   environment:
   sdk: '^3.2.0'
+```
+- 通过`dart pub add` 加库名称来安装库
+
+如 `dart pub add dio` 后根据官方文档的示例来使用。
+
+
+
+# Dart 中的并发
+
+## Futrue 如果使用了async 异步亲求，返回的类型一定要是Future类型的。
+
+Future 调用类似于 promise ，相当于是微任务。
+
+```dart
+void main(List<String> args) {
+  print('start');
+  Future(() { // 异步执行
+    print('111111111');
+  });
+  Future.sync(() { // 同步执行
+    print('22222');
+  });
+  Future.delayed(Duration(seconds: 2), () { // 可以指定延迟多久执行
+    print('3333333');
+  });
+  print('end');
+}
+// 打印结果
+// start
+// 22222
+// end
+// 111111111
+// 22222
+```
+
+### 除了可以使用async和awite Future 也可以使用`.then` `.cacth`来获取结果。类似返回一个promise对象
+
+```dart
+import 'dart:io';
+
+void main(List<String> args) {
+  print('start');
+  req().then((value) {
+    print(value);
+  });
+  print('end');
+}
+
+Future req() {
+  return Future(() {
+    sleep(Duration(seconds: 2));
+    return '模拟请求';
+  });
+}
+// 打印结果
+// start
+// end
+// 模拟请求
+```
+
+### Future 也可以像promise一样链式调用。之前js的写法是可以的 还可以return 另一个Future对象，进行链式调用
+
+
+
+```dart
+import 'dart:io';
+
+void main(List<String> args) {
+  // req().then((value) {
+  //   print(value);
+  //   req2(value).then((v2) {
+  //     print(v2);
+  //   });
+  // });
+  // 返回一个新的Future  可以进行链式调用 与上面的写法 结果一致
+  req().then((value) {
+    print(value);
+    return req2(value);
+  }).then((value) {
+    print(value);
+  });
+}
+
+Future req() {
+  return Future(() {
+    sleep(Duration(seconds: 2));
+    return '模拟请求';
+  });
+}
+
+Future req2(value) {
+  return Future(() {
+    sleep(Duration(seconds: 2));
+    return '第二个请求';
+  });
+}
+
+```
+
+也可以使用async 和 await,将异步代码同步的写出，去掉了.then的链式调用
+```dart
+void main(List<String> args) async{
+  String value = await req();
+  String value2 = await req2(value2);
+  print(value);
+  print(value2);
+}
+```
+
+### Future.wait 类似于Promise.all
+这里调用上面写过的两个方法，结果是两个返回值组成的数组
+```dart
+void main(List<String> args) {
+  Future.wait([req(), req2(23)]).then((value) {
+    print(value);
+    // 等待传入的异步都执行完毕再操作
+  });
+}
+```
+```dart
+void main(List<String> args) async{
+  var res = Future.wait([req(), req2(23)])
+  print(res);
+}
+```
+
+# Ioslate 隔离 
+
+**将原本单线程的内容模拟成“多线程”，在主线程中创建新的隔离执行耗时任务，不会阻塞主线程的执行，执行完成后再通过管道将结果输送给主线程**
+```dart
+import 'dart:io';
+import 'dart:isolate';
+
+void main(List<String> args) async {
+  print('start');
+  // 通过自带的ioslate 中的ReceivePort 来创建管道，需要再Isolate.spawn 第二个参数传入。
+  ReceivePort port = ReceivePort();
+  // 创建隔离，传入执行的任务，一级管道
+  var taskres = await Isolate.spawn(task, port.sendPort);
+  // 通过listen 方法接收 send传递的内容。
+  port.listen((message) {
+    print(message);
+    // 操作结束后要关闭管道
+    port.close();
+    // 杀死线程
+    taskres.kill();
+  });
+  print('end');
+}
+
+void task(SendPort port) {
+  sleep(Duration(seconds: 2));
+  // 隔离的参数返回内容需要调用 port.send
+  return port.send('task finash');
+}
+
 ```

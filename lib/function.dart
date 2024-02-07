@@ -18,7 +18,7 @@ void main(List<String> args) {
     'list': [1, 2],
     'title': 'xxee'
   });
-  print(data._data);
+  print(data);
 }
 
 // void代表函数没有返回值，前面的内容用来后面确定函数返回值的类型

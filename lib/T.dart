@@ -1,6 +1,6 @@
 // 泛型
 void main(List<String> args) {
-  List<String> list = ['23', '32'];
+  // List<String> list = ['23', '32'];
   print(getValue<String>('EW'));
   print(getValue<int>(2));
   Document<String> docs = Document({'title': 'title', 'content': 'content'});

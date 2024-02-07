@@ -33,8 +33,8 @@ void main(List<String> args) {
   group.detail();
   group.group();
   group.detail();
-  print(group is Group);
-  print(group is Student);
+  // print(group is Group);
+  // print(group is Student);
 }
 
 class Student {
