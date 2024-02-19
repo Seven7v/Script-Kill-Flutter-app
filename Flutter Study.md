@@ -1113,15 +1113,14 @@ class MameryCatch<T> extends Catch<T> {
   environment:
   sdk: '^3.2.0'
 ```
+
 - 通过`dart pub add` 加库名称来安装库
 
 如 `dart pub add dio` 后根据官方文档的示例来使用。
 
-
-
 # Dart 中的并发
 
-## Futrue 如果使用了async 异步亲求，返回的类型一定要是Future类型的。
+## Futrue 如果使用了 async 异步亲求，返回的类型一定要是 Future 类型的。
 
 Future 调用类似于 promise ，相当于是微任务。
 
@@ -1147,7 +1146,7 @@ void main(List<String> args) {
 // 22222
 ```
 
-### 除了可以使用async和awite Future 也可以使用`.then` `.cacth`来获取结果。类似返回一个promise对象
+### 除了可以使用 async 和 awite Future 也可以使用`.then` `.cacth`来获取结果。类似返回一个 promise 对象
 
 ```dart
 import 'dart:io';
@@ -1172,9 +1171,7 @@ Future req() {
 // 模拟请求
 ```
 
-### Future 也可以像promise一样链式调用。之前js的写法是可以的 还可以return 另一个Future对象，进行链式调用
-
-
+### Future 也可以像 promise 一样链式调用。之前 js 的写法是可以的 还可以 return 另一个 Future 对象，进行链式调用
 
 ```dart
 import 'dart:io';
@@ -1211,7 +1208,8 @@ Future req2(value) {
 
 ```
 
-也可以使用async 和 await,将异步代码同步的写出，去掉了.then的链式调用
+也可以使用 async 和 await,将异步代码同步的写出，去掉了.then 的链式调用
+
 ```dart
 void main(List<String> args) async{
   String value = await req();
@@ -1221,8 +1219,10 @@ void main(List<String> args) async{
 }
 ```
 
-### Future.wait 类似于Promise.all
+### Future.wait 类似于 Promise.all
+
 这里调用上面写过的两个方法，结果是两个返回值组成的数组
+
 ```dart
 void main(List<String> args) {
   Future.wait([req(), req2(23)]).then((value) {
@@ -1231,6 +1231,7 @@ void main(List<String> args) {
   });
 }
 ```
+
 ```dart
 void main(List<String> args) async{
   var res = Future.wait([req(), req2(23)])
@@ -1238,9 +1239,10 @@ void main(List<String> args) async{
 }
 ```
 
-# Ioslate 隔离 
+# Ioslate 隔离
 
 **将原本单线程的内容模拟成“多线程”，在主线程中创建新的隔离执行耗时任务，不会阻塞主线程的执行，执行完成后再通过管道将结果输送给主线程**
+
 ```dart
 import 'dart:io';
 import 'dart:isolate';
@@ -1266,6 +1268,96 @@ void task(SendPort port) {
   sleep(Duration(seconds: 2));
   // 隔离的参数返回内容需要调用 port.send
   return port.send('task finash');
+}
+
+```
+
+# 生成器
+
+**Dart 中生成器是一种函数类型，能够按需产生序列值，在处理大量数据或异步场景非常实用**
+生成器的函数时惰性的，只有在需要值的时候才会计算
+
+生成器生成的可迭代对象可以使用 for in 循环。遍历时是按需生成的，避免占用大量空间
+
+## 同步生成器，返回一个 Iterable 对象， 使用 sycn\*关键词
+
+读取磁盘文件时，如果一次性读取会占用很多内存，就可以使用生成器来读取。
+
+```dart
+import 'dart:io';
+
+void main(List<String> args) {
+  // 生成器
+  for (var item in ReadFile()) {
+    print(item);
+  }
+}
+
+Iterable count(n) sync* {
+  for (int i = 0; i < n; i++) {
+    yield i; // 相当于遇到yield 就挂起，下次访问数据时再向下走一次。
+  }
+}
+
+// 生成器的写法，需要在后面加上sync*
+Iterable<File> ReadFile() sync* {
+  final directory = Directory('F:/v3');
+  // 代表会深层遍历
+  final files = directory.listSync(recursive: true);
+  for (var file in files) {
+    if (file is File) {
+      yield file;
+    }
+  }
+}
+
+```
+
+## 异步生成器 返回一个 Stream 对象，使用 async\*关键词
+
+```dart
+
+void main(List<String> args) async {
+  // 调用异步生成器的时候需要使用await
+  // 函数也需要加上async
+  await for (var item in count(5)) {
+    print(item);
+  }
+  // 读取文件返回的是Stream的异步生成器，可以异步读取文件
+  var doc = File('F:/v3/Script-Kill-Flutter-app/Flutter Study.md');
+  Stream document = doc.openRead();
+  var lines = document.transform(utf8.decoder).transform(LineSplitter());
+  await for (var item in lines) {
+    print(item);
+  }
+}
+
+Stream count(n) async* {
+  for (int i = 0; i < n; i++) {
+    await Future.delayed(Duration(seconds: 3));
+    yield i; // 相当于遇到yield 就挂起，下次访问数据时再向下走一次。
+  }
+}
+
+```
+
+# Dart Extension 对于自带，自定义或三方库的扩展方法
+
+写法是一致的，就是给已经存在的内容，添加自定义方法
+
+```dart
+void main(List<String> args) {
+  String name = 'seven';
+  print(name.cap());
+}
+
+extension StringExtension on String {
+  String cap() {
+    if (this.isEmpty) {
+      return '不能为空';
+    }
+    return '${this.substring(0, 1).toUpperCase()}${this.substring(1)}';
+  }
 }
 
 ```
