@@ -2,6 +2,8 @@
 
 为了方便运行可以下载一个 CodeRunner 插件，可以右键点击运行
 
+vscode 创建 flutter 项目教程 https://flutter.cn/docs/get-started/test-drive
+
 ### 创建页面
 
 使用 dart 语言，需要创建一个`.dart`结尾的文件。
